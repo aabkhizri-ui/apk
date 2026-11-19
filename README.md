@@ -22,6 +22,10 @@ ADM-0001 / admin123, USR-0001 / U5R8WN, EMP-0001 / K7M2QX, BKR-0001 / P4D9ZT. CH
 Admin creates User IDs, User creates Employer/Booker IDs, Shopkeepers create their own SHP ID.
 IDs are generated automatically per role. Shopkeepers order bundles with + / - buttons.
 
+Logins: ID (EMP-0001) or +92 mobile, password and numeric captcha.
+Employer: orders -> Create bill (INV-000n) -> Dispatch -> Delivered, and a printable invoice (Print button).
+Shopkeeper: + / - per bundle at wholesale rate, order history, overall summary, print own bills.
+
 ## Status
 Logins are checked in the browser and saved in this browser only (demo level, NOT secure).
 Real security needs Supabase Auth (schema.sql is ready for it). Don't share the hash links publicly yet.
