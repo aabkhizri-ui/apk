@@ -16,6 +16,13 @@ Files: index.html, style.css, app.js, config.js, logo.png, schema.sql
 2. `config.js` already has the project URL and the public key. Set your WhatsApp number there.
 3. Only publishable keys go in config.js. Never use the service_role key in the browser.
 
+## Logins (demo)
+Each portal has its own ID + password login. Demo accounts:
+ADM-0001 / admin123, USR-0001 / U5R8WN, EMP-0001 / K7M2QX, BKR-0001 / P4D9ZT. CHANGE THEM before going live.
+Admin creates User IDs, User creates Employer/Booker IDs, Shopkeepers create their own SHP ID.
+IDs are generated automatically per role. Shopkeepers order bundles with + / - buttons.
+
 ## Status
-The website can save guest orders to Supabase after step 1. The staff portals are still demo screens
-(no real login yet), so don't share the hash links publicly.
+Logins are checked in the browser and saved in this browser only (demo level, NOT secure).
+Real security needs Supabase Auth (schema.sql is ready for it). Don't share the hash links publicly yet.
+The public website can save guest orders to Supabase after running schema.sql.

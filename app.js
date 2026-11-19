@@ -2,7 +2,7 @@ let L='en';const T=(e,u)=>L==='ur'?u:e,$=i=>document.getElementById(i);
 const R=[['admin','Admin','ایڈمن'],['user','User','یوزر'],['employer','Employer','ایمپلائر'],['booker','Order Booker','آرڈر بکر'],['shopkeeper','Shopkeeper','شاپ کیپر']];
 const D={bundles:[{id:1,paid:6,free:2,retail:3000,whole:2700,tok:50},{id:2,paid:12,free:4,retail:6000,whole:5300,tok:100}],
 orders:[{id:1,src:'Website',who:'Guest',b:1,q:2,amt:6000,disc:0,st:'Pending'}],
-reqs:[],ids:[{role:'Employer',id:'EMP-0001',pw:'K7M2QX',name:'Ali',mob:'3001234567'},{role:'Booker',id:'BKR-0001',pw:'P4D9ZT',name:'Bilal',mob:'3007654321'}],
+reqs:[],ids:[{role:'Admin',id:'ADM-0001',pw:'admin123',name:'Admin',mob:''},{role:'User',id:'USR-0001',pw:'U5R8WN',name:'Sara',mob:'3005551111'},{role:'Employer',id:'EMP-0001',pw:'K7M2QX',name:'Ali',mob:'3001234567'},{role:'Booker',id:'BKR-0001',pw:'P4D9ZT',name:'Bilal',mob:'3007654321'}],
 token:10,tick:0,shop:null,tokens:0,sel:1,cap:'0000'};
 const rs=n=>'Rs '+Math.round(n).toLocaleString();
 const PF={Admin:'ADM',User:'USR',Employer:'EMP',Booker:'BKR',Shopkeeper:'SHP'};
@@ -16,7 +16,7 @@ function stats(a){return `<div class="grid">`+a.map(x=>`<div class="st"><b>${x[1
 function bundleBtns(){return D.bundles.map(b=>`<button class="b2 ${D.sel==b.id?'on':''}" onclick="D.sel=${b.id};go()">${b.paid} + ${b.free} ${T('Free','فری')}</button>`).join('')}
 function idForm(roles){return `<div class="card"><h3>${T('Create ID (automatic)','آئی ڈی بنائیں (خودکار)')}</h3><div class="mu">${T('ID and password are generated automatically. Each role has its own series: ADM / USR / EMP / BKR / SHP.','آئی ڈی اور پاس ورڈ خودکار بنتے ہیں۔ ہر کردار کی الگ سیریز: ADM / USR / EMP / BKR / SHP۔')}</div><div class="row"><select id="ir">${roles.map(r=>`<option>${r}</option>`).join('')}</select><input id="in" placeholder="${T('Name','نام')}"><span class="mu">+92</span><input id="im" inputmode="numeric" maxlength="10" placeholder="3XXXXXXXXX"><button class="b" onclick="mk()">${T('Create','بنائیں')}</button></div><div id="im2" class="ok">${D.last?T('Created: ','بن گئی: ')+D.last.id+' / '+D.last.pw:''}</div></div>`+
 `${(roles.includes('User')?[...roles,'Shopkeeper']:roles).map(r=>`<div class="card"><h3>${r} IDs</h3><div class="tw"><table><tr><th>ID</th><th>${T('Name','نام')}</th><th>${T('Mobile','موبائل')}</th><th>${T('Password','پاس ورڈ')}</th></tr>${D.ids.filter(i=>i.role===r).map(i=>`<tr><td><b>${i.id}</b></td><td>${i.name}</td><td>+92 ${i.mob}</td><td>${i.pw}</td></tr>`).join('')}</table></div></div>`).join('')}`}
-function mk(){const m=$('im').value,n=$('in').value.trim();if(!n||!/^\d{10}$/.test(m)){$('im2').textContent=T('Enter name and exactly 10 digits','نام اور پورے 10 ہندسے درج کریں');return}const r=$('ir').value,x={role:r,id:nid(r),pw:pw(),name:n,mob:m};D.ids.push(x);D.last=x;go()}
+function mk(){const m=$('im').value,n=$('in').value.trim();if(!n||!/^\d{10}$/.test(m)){$('im2').textContent=T('Enter name and exactly 10 digits','نام اور پورے 10 ہندسے درج کریں');return}const r=$('ir').value,x={role:r,id:nid(r),pw:pw(),name:n,mob:m};D.ids.push(x);save();D.last=x;go()}
 function newCap(){D.cap=String(Math.floor(Math.random()*9000)+1000)}
 const V={
 admin(){const tot=D.orders.reduce((s,o)=>s+o.amt-o.disc,0);
@@ -28,22 +28,38 @@ D.bundles.map((b,i)=>`<tr>${['paid','free','retail','whole','tok'].map(k=>`<td><
 `<div class="card"><h3>${T('All orders','تمام آرڈرز')}</h3>${ordTable(D.orders)}</div>`+idForm(['User','Employer','Booker'])},
 user(){const bk=D.ids.filter(i=>i.role==='Booker');return `<h1>${T('User (Sub-Admin) Panel','یوزر (سب ایڈمن) پینل')}</h1>`+stats([[T('Employers','ایمپلائرز'),D.ids.filter(i=>i.role==='Employer').length],[T('Order Bookers','آرڈر بکرز'),bk.length],[T('Booker orders','بکر آرڈرز'),D.orders.filter(o=>o.src==='Booker').length]])+idForm(['Employer','Booker'])+
 `<div class="card"><h3>${T('Booker performance','بکرز کی کارکردگی')}</h3>${bk.map(b=>`<div class="row">${b.name}: <b>${D.orders.filter(o=>o.who===b.name).length}</b> ${T('orders','آرڈرز')}</div>`).join('')||'—'}</div>`},
-employer(){const p=D.orders.filter(o=>o.st==='Pending');return `<h1>${T('Employer Dispatch','ایمپلائر ڈسپیچ')} · EMP-0001</h1>`+stats([[T('Pending','زیر التوا'),p.length],[T('Delivered','ڈیلیور'),D.orders.length-p.length],[T('Website orders','ویب آرڈرز'),D.orders.filter(o=>o.src==='Website').length]])+
+employer(){const p=D.orders.filter(o=>o.st==='Pending');return `<h1>${T('Employer Dispatch','ایمپلائر ڈسپیچ')} · ${D.sess.employer.id}</h1>`+stats([[T('Pending','زیر التوا'),p.length],[T('Delivered','ڈیلیور'),D.orders.length-p.length],[T('Website orders','ویب آرڈرز'),D.orders.filter(o=>o.src==='Website').length]])+
 `<div class="card"><h3>${T('Live queue (website + field)','لائیو قطار (ویب + فیلڈ)')}</h3>${ordTable(D.orders,o=>o.st==='Pending'?`<button class="b" onclick="D.orders[${o.id-1}].st='Done';go()">${T('Deliver','ڈیلیور')}</button>`:'✓')}</div>`},
-booker(){const me='Bilal',mine=D.orders.filter(o=>o.who===me);return `<h1>${T('Order Booker','آرڈر بکر')} · BKR-0001</h1>`+stats([[T('Booked','بُک'),mine.length],[T('Bottles','بوتلیں'),mine.reduce((s,o)=>{const b=D.bundles.find(x=>x.id==o.b);return s+o.q*(b.paid+b.free)},0)]])+
+booker(){const me=D.sess.booker.name,mine=D.orders.filter(o=>o.who===me);return `<h1>${T('Order Booker','آرڈر بکر')} · ${D.sess.booker.id}</h1>`+stats([[T('Booked','بُک'),mine.length],[T('Bottles','بوتلیں'),mine.reduce((s,o)=>{const b=D.bundles.find(x=>x.id==o.b);return s+o.q*(b.paid+b.free)},0)]])+
 `<div class="card"><h3>${T('Book order','آرڈر بک کریں')}</h3><div class="row"><input id="shn" placeholder="${T('Shop name','دکان کا نام')}"></div><div class="row">${bundleBtns()}<input class="n" id="bq" type="number" min="1" value="1"></div><button class="b" onclick="bk()">${T('Book (wholesale)','بک کریں (ہول سیل)')}</button></div><div class="card"><h3>${T('My orders','میرے آرڈرز')}</h3>${ordTable(mine)}</div>`},
-shopkeeper(){if(!D.shop)return `<h1>${T('Shopkeeper Sign Up','شاپ کیپر سائن اپ')}</h1><div class="card"><div class="row"><span class="mu">+92</span><input id="sm" inputmode="numeric" maxlength="10" placeholder="3XXXXXXXXX"></div><div class="row"><input id="sp" type="password" placeholder="${T('Password','پاس ورڈ')}"><button class="b2" onclick="$('sp').type=$('sp').type==='password'?'text':'password'">👁</button></div><div class="row"><span class="cap">${D.cap}</span><button class="b2" onclick="newCap();go()">⟳</button><input class="n" id="sc" inputmode="numeric" maxlength="4"></div><div id="sx" class="mu"></div><button class="b" onclick="su()">${T('Sign Up','سائن اپ')}</button></div>`+
-`<div class="card"><h3>${T('Guest website order (retail)','مہمان ویب آرڈر (ریٹیل)')}</h3><div class="row">${bundleBtns()}<button class="b" onclick="addOrder('Website','Guest',D.sel,1,0);go();alert('${T('Sent to Employer and Admin','ایمپلائر اور ایڈمن کو بھیج دیا گیا')}')">${T('Order','آرڈر')}</button></div></div>`;
-const mine=D.orders.filter(o=>o.who===D.shop);return `<h1>${T('Shopkeeper','شاپ کیپر')} ${D.sid} · +92 ${D.shop}</h1>`+stats([[T('Tokens','ٹوکن'),D.tokens],[T('Wallet value','والٹ ویلیو'),rs(D.tokens*D.token)],[T('Orders','آرڈرز'),mine.length]])+
-`<div class="card"><h3>${T('Order (wholesale rate)','آرڈر (ہول سیل ریٹ)')}</h3><div class="row">${bundleBtns()}<input class="n" id="bq" type="number" min="1" value="1"><button class="b" onclick="so()">${T('Order','آرڈر')}</button></div></div>`+
+shopkeeper(){if(!D.shop)return shopAuth();
+const mine=D.orders.filter(o=>o.who===D.shop);return `<h1>${T('Shopkeeper','شاپ کیپر')} ${D.sid} · +92 ${D.shop}</h1>`+(D.last?`<div class="card ok">${T('Your ID: ','آپ کی آئی ڈی: ')}${D.last.id}</div>`:'')+stats([[T('Tokens','ٹوکن'),D.tokens],[T('Wallet value','والٹ ویلیو'),rs(D.tokens*D.token)],[T('Orders','آرڈرز'),mine.length]])+
+`<div class="card"><h3>${T('Order (wholesale rate)','آرڈر (ہول سیل ریٹ)')}</h3>`+D.bundles.map(b=>`<div class="pk"><div><b>${b.paid} + ${b.free} ${T('Free','فری')}</b><div class="mu">${b.paid+b.free} ${T('bottles','بوتلیں')} · +${b.tok} ${T('tokens','ٹوکن')}</div></div><div class="p">${rs(b.whole)}</div><div class="row"><button class="b2" onclick="sq(${b.id},-1)">−</button><b>${D.scart[b.id]||0}</b><button class="b2" onclick="sq(${b.id},1)">+</button></div></div>`).join('<hr style="border:0;border-top:1px solid var(--bd)">')+`<div class="row"><b>${T('Total','کل')}: <span class="p">${rs(D.bundles.reduce((s,b)=>s+(D.scart[b.id]||0)*b.whole,0))}</span></b><button class="b" onclick="so()">${T('Place order','آرڈر کریں')}</button></div></div>`+
 `<div class="card"><h3>${T('My orders','میرے آرڈرز')}</h3>${ordTable(mine,o=>o.disc||D.reqs.some(r=>r.o==o.id)?'':`<button class="b2" onclick="D.reqs.push({o:${o.id},shop:'+92 ${D.shop}',done:0});go()">${T('Ask discount','ڈسکاؤنٹ مانگیں')}</button>`)}</div><div class="card"><h3>${T('Live token market','لائیو ٹوکن مارکیٹ')}</h3><div class="tick" id="tp"></div><div class="mu">${T('Non-cash: usable in-app only.','نان کیش: صرف ایپ کے اندر۔')}</div></div>`}};
 function adj(d){D.token=Math.max(.5,D.token+d);paint(d)}
 function paint(d){const e=$('tp');if(e)e.innerHTML='Rs '+D.token.toFixed(2)+' '+(d>=0?'<span class="up">▲</span>':'<span class="dn">▼</span>')}
 function appr(i){const a=+$('d'+i).value;if(!(a>0))return;const r=D.reqs[i];r.done=1;r.amt=a;D.orders[r.o-1].disc=a;go()}
-function bk(){const s=$('shn').value.trim()||'Shop';addOrder('Booker','Bilal',D.sel,Math.max(1,+$('bq').value||1),1);go()}
-function so(){const q=Math.max(1,+$('bq').value||1),o=addOrder('Shopkeeper','+92 '+D.shop,D.sel,q,1);D.tokens+=q*D.bundles.find(x=>x.id==D.sel).tok;D.orders[o.id-1].who=D.shop;go()}
+function bk(){const s=$('shn').value.trim()||'Shop';addOrder('Booker',D.sess.booker.name,D.sel,Math.max(1,+$('bq').value||1),1);go()}
+function so(){const l=D.bundles.filter(b=>D.scart[b.id]>0);if(!l.length)return;l.forEach(b=>{const q=D.scart[b.id];addOrder('Shopkeeper',D.shop,b.id,q,1);D.tokens+=q*b.tok});D.scart={};go()}
 function su(){const ok=/^\d{10}$/.test($('sm').value),pw=$('sp').value.length>=6,c=$('sc').value===D.cap;
-if(ok&&pw&&c){const m=$('sm').value,x={role:'Shopkeeper',id:nid('Shopkeeper'),pw:$('sp').value,name:'Shop',mob:m};D.ids.push(x);D.shop=m;D.sid=x.id;D.last=x;go();return}$('sx').textContent=!ok?T('Exactly 10 digits after +92','+92 کے بعد پورے 10 ہندسے'):!pw?T('Password: 6+ characters','پاس ورڈ کم از کم 6 حروف'):T('Captcha mismatch','کیپچا درست نہیں');if(!c){newCap();setTimeout(go,900)}}
+if(ok&&pw&&c){const m=$('sm').value,x={role:'Shopkeeper',id:nid('Shopkeeper'),pw:$('sp').value,name:'Shop',mob:m};if(D.ids.some(i=>i.role==='Shopkeeper'&&i.mob===m)){$('sx').textContent=T('This mobile is already registered','یہ موبائل پہلے سے رجسٹرڈ ہے');return}D.ids.push(x);save();D.shop=m;D.sid=x.id;D.last=x;go();return}$('sx').textContent=!ok?T('Exactly 10 digits after +92','+92 کے بعد پورے 10 ہندسے'):!pw?T('Password: 6+ characters','پاس ورڈ کم از کم 6 حروف'):T('Captcha mismatch','کیپچا درست نہیں');if(!c){newCap();setTimeout(go,900)}}
+D.sess={};D.scart={};D.lm='login';
+try{const st=JSON.parse(localStorage.getItem('ak_ids')||'null');if(st&&st.length)D.ids=st}catch(e){}
+if(!D.ids.some(i=>i.role==='Admin'))D.ids.unshift({role:'Admin',id:'ADM-0001',pw:'admin123',name:'Admin',mob:''});
+const save=()=>{try{localStorage.setItem('ak_ids',JSON.stringify(D.ids))}catch(e){}};
+const eye=i=>{$(i).type=$(i).type==='password'?'text':'password'};
+const sq=(id,d)=>{D.scart[id]=Math.max(0,(D.scart[id]||0)+d);go()};
+const RN={admin:'Admin',user:'User',employer:'Employer',booker:'Booker',shopkeeper:'Shopkeeper'},PX={admin:'ADM',user:'USR',employer:'EMP',booker:'BKR'};
+let tries=0;const bad=()=>T('Wrong ID or password','آئی ڈی یا پاس ورڈ غلط ہے');
+function loginView(k){const r=R.find(x=>x[0]===k);return `<h1>${T(r[1],r[2])} · ${T('Login','لاگ ان')}</h1><div class="card"><div class="row"><input id="li" placeholder="${T('ID','آئی ڈی')} (${PX[k]}-0001)"></div><div class="row"><input id="lp" type="password" placeholder="${T('Password','پاس ورڈ')}"><button class="b2" onclick="eye('lp')">👁</button></div><div id="sx" class="er"></div><button class="b" onclick="lg('${k}')">${T('Login','لاگ ان')}</button></div>`}
+function lg(k){if(tries>=5){$('sx').textContent=T('Too many attempts. Reload the page.','بہت زیادہ کوششیں۔ صفحہ دوبارہ کھولیں۔');return}const q=$('li').value.trim().toUpperCase(),p=$('lp').value,a=D.ids.find(i=>i.role===RN[k]&&i.id===q&&i.pw===p);if(!a){tries++;$('sx').textContent=bad();return}tries=0;D.sess[k]=a;go()}
+function sl(){const q=$('li').value.trim().toUpperCase(),p=$('lp').value,a=D.ids.find(i=>i.role==='Shopkeeper'&&(i.id===q||i.mob===q)&&i.pw===p);if(!a){$('sx').textContent=bad();return}D.shop=a.mob;D.sid=a.id;D.last=null;go()}
+function lo(k){if(k==='shopkeeper'){D.shop=null;D.sid=null}else delete D.sess[k];D.last=null;go()}
+function shopAuth(){const g=D.lm==='signup',pf=g?'sp':'lp';return `<h1>${T('Shopkeeper','شاپ کیپر')}</h1><div class="row"><button class="b2 ${g?'':'on'}" onclick="D.lm='login';go()">${T('Login','لاگ ان')}</button><button class="b2 ${g?'on':''}" onclick="D.lm='signup';go()">${T('Create ID','آئی ڈی بنائیں')}</button></div><div class="card">`+
+(g?`<div class="row"><span class="mu">+92</span><input id="sm" inputmode="numeric" maxlength="10" placeholder="3XXXXXXXXX"></div>`:`<div class="row"><input id="li" placeholder="${T('ID (SHP-0001) or mobile','آئی ڈی (SHP-0001) یا موبائل')}"></div>`)+
+`<div class="row"><input id="${pf}" type="password" placeholder="${T('Password','پاس ورڈ')}"><button class="b2" onclick="eye('${pf}')">👁</button></div>`+
+(g?`<div class="row"><span class="cap">${D.cap}</span><button class="b2" onclick="newCap();go()">⟳</button><input class="n" id="sc" inputmode="numeric" maxlength="4"></div>`:'')+
+`<div id="sx" class="er"></div><button class="b" onclick="${g?'su()':'sl()'}">${g?T('Create ID','آئی ڈی بنائیں'):T('Login','لاگ ان')}</button></div>`}
 const AL={admin:'admin',administrator:'admin',user:'user',subadmin:'user',employer:'employer',employee:'employer',emp:'employer',booker:'booker',orderbooker:'booker',shopkeeper:'shopkeeper',shop:'shopkeeper'};
 
 const AK=window.AK||{};let sb=null;try{if(AK.url&&window.supabase)sb=window.supabase.createClient(AK.url,AK.key)}catch(e){}
@@ -73,9 +89,11 @@ return `<section class="hero"><img src="logo.png" alt="Aab-e-Khizri Cumin Water"
 
 function go(){let h=decodeURIComponent(location.hash.slice(1)).toLowerCase().replace(/^[\/!]+/,'').replace(/[\s_-]+/g,'');const k=AL[h]||'home';
 $('nav').innerHTML='<a href="#" class="'+(k==='home'?'on':'')+'">⌂</a>'+R.map(r=>`<a href="#${r[0]}" class="${r[0]===k?'on':''}">${T(r[1],r[2])}</a>`).join('');
-if(k==='home')$('nav').innerHTML='';$('brand').textContent=T('Aab-e-Khizri','آبِ خضری');$('sw').textContent=L==='en'?'اردو':'English';
+$('nav').innerHTML='';$('brand').textContent=T('Aab-e-Khizri','آبِ خضری');$('sw').textContent=L==='en'?'اردو':'English';
 document.documentElement.lang=L;document.documentElement.dir=L==='ur'?'rtl':'ltr';
-const a=document.activeElement&&document.activeElement.id;$('v').innerHTML=V[k]();paint(0)}
+const need=k!=='home'&&k!=='shopkeeper'&&!D.sess[k],inn=k==='shopkeeper'?D.shop:D.sess[k];
+const bar=k!=='home'&&inn?`<div class="row" style="justify-content:space-between"><span class="tag">${k==='shopkeeper'?D.sid:D.sess[k].id}</span><button class="b2" onclick="lo('${k}')">${T('Logout','لاگ آؤٹ')}</button></div>`:'';
+$('v').innerHTML=need?loginView(k):bar+V[k]();paint(0)}
 $('sw').onclick=()=>{L=L==='en'?'ur':'en';go()};
 addEventListener('hashchange',()=>{scrollTo(0,0);D.last=null;go()});
 setInterval(()=>{D.token=Math.max(.5,D.token+(Math.random()-.5)*.2);paint(0)},3000);
