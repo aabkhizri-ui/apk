@@ -26,6 +26,10 @@ Logins: ID (EMP-0001) or +92 mobile, password and numeric captcha.
 Employer: orders -> Create bill (INV-000n) -> Dispatch -> Delivered, and a printable invoice (Print button).
 Shopkeeper: + / - per bundle at wholesale rate, order history, overall summary, print own bills.
 
+## Billing
+Employer: Create bill (auto INV-0001...) -> Dispatch -> Delivered, and print the invoice (logo included).
+Logins accept ID or +92 mobile, password and a numeric captcha. Order Booker and Shopkeeper book bundles with + / - at wholesale rates.
+
 ## Status
 Logins are checked in the browser and saved in this browser only (demo level, NOT secure).
 Real security needs Supabase Auth (schema.sql is ready for it). Don't share the hash links publicly yet.
